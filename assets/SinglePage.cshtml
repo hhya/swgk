@@ -1,0 +1,44 @@
+﻿@model SXCH.Lasted.Models.ViewModel.Home.SinglePage
+@{
+    Layout = "~/Views/Shared/_PreLayoutManage.cshtml";
+}
+@if (!string.IsNullOrEmpty(Model.CurrentTopVSimpleBlock.FirstBigImage))
+{
+    <div class="big-pic" style="background-image:url('@Model.CurrentTopVSimpleBlock.FirstBigImage')">
+    </div>
+}
+else
+{
+    <div class="big-pic">
+    </div>
+}
+@Html.Partial("/Views/Home/PartialLocation.cshtml", Model)
+<div class="bg-white-bg">
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-3">
+                @Html.Partial("/Views/Home/PartialSide.cshtml", Model)
+            </div>
+            <!--col end-->
+            <div class="col-xs-12 col-sm-9">
+                <div class="content">
+                    <div class="main-title clearfix">
+                        <div class="tt">@Model.CurrentBlock.Block_Name</div>
+                    </div>
+                    <!--title end-->
+                    <div class="clearB">
+                    </div>
+                    <div class="a-cont">
+                       
+                        <div class="cont">
+                            @Html.Raw(Model.BlockContent)
+                        </div>
+                    </div>
+                    <!--a-list end-->
+                </div>
+            </div>
+        </div>
+        <!--row end-->
+    </div>
+    <!--container end-->
+</div>

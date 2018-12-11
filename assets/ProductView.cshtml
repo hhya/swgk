@@ -1,0 +1,190 @@
+﻿@model SXCH.Lasted.Models.ViewModel.Home.ProductView
+@{
+    Layout = "~/Views/Shared/_PreLayoutManage.cshtml";
+    List<SXCH.Lasted.Models.Block> LProductBlock = new List<SXCH.Lasted.Models.Block>();
+    LProductBlock = Model.LAllBlock.FindAll(m => m.Block_Parent_Id == Model.CurrentBlock.Block_Id && !m.Is_PreHidden);
+    #region 二维码信息
+    SXCH.Lasted.Models.Block EWMBlock = Model.LAllBlock.Find(m => m.Block_Id == Model.ConfigHandler.GetConfigString("EWMBlockID"));
+    EWMBlock = EWMBlock ?? new SXCH.Lasted.Models.Block();
+    List<SXCH.Lasted.Models.VSimpleInfor> LRecommendEWM = new List<SXCH.Lasted.Models.VSimpleInfor>();
+    LRecommendEWM = SXCH.Lasted.Base.BllCollection.BVSimpleInfor.GetModelList(2, " Block_Order like '" + EWMBlock.Block_Order + "%' and  Is_Delete=false ", Model.InforOrder, true);
+
+    #endregion
+    if (LProductBlock.Count == 0)
+    {
+        LProductBlock = Model.LAllBlock.FindAll(m => m.Block_Parent_Id != "0" && m.Block_Parent_Id == Model.CurrentBlock.Block_Parent_Id && !m.Is_PreHidden);
+    }
+    SXCH.Lasted.Models.VSimpleBlock ProductBlock = Model.LAllVSimpleBlock.Find(m => m.Block_Id == Model.ConfigHandler.GetConfigString("ProductBlockID"));
+    ProductBlock = ProductBlock ?? new SXCH.Lasted.Models.VSimpleBlock();
+    List<SXCH.Lasted.Models.Block> LProductSonBlock = Model.LAllBlock.FindAll(m => m.Block_Parent_Id == ProductBlock.Block_Id && !m.Is_PreHidden);
+    var LRecommandProduct = SXCH.Lasted.Base.BllCollection.BVSimpleProduct.GetModelList(4, "Block_Id='" + Model.CurrentBlock.Block_Id + "' and Product_Id<>'" + Model.MVProduct.Product_Id + "'", Model.ProductOrder);
+    string ServiceQQ = Model.MWebConfig.LCommunicationTool.Count > 0 ? Model.MWebConfig.LCommunicationTool[0].CommunicationID : "";
+}
+@Html.Partial("/Views/Home/PartialLocation.cshtml", Model)
+<div class="bg-white-bg">
+    <div class="container">
+        <div class="index-cate">
+            <ul class="clearfix">
+                @foreach (var item in LProductBlock)
+                {
+                    <li @(Model.CurrentBlock.Block_Id == item.Block_Id ? Html.Raw("class=\"curr\"") : Html.Raw(""))>
+                        <a href="@item.Block_Url" title="@item.Block_Name">@item.Block_Name </a></li>
+                }
+            </ul>
+        </div>
+        <div class="index-about-line">
+        </div>
+        <div class="p-cont">
+            <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-4">
+                    <div class="p-pic">
+                        <div id="slider">
+                            <div id="carousel-bounding-box">
+                                <div id="myCarousel" class="carousel slide">
+                                    <!-- main slider carousel items -->
+                                    <div class="carousel-inner">
+                                        @for (int i = 0; i < Model.MVProduct.LImageSlider.Count; i++)
+                                        {
+                                            var item = Model.MVProduct.LImageSlider[i];
+                                            <div class="@(i==0?"active item":"item")" data-slide-number="@i">
+                                                <img src="@item.ImagePath" class="img-responsive">
+                                            </div>
+                                        }
+                                    </div>
+                                    <!-- main slider carousel nav controls -->
+                                    <a class="carousel-control left" href="#myCarousel" data-slide="prev">‹</a> <a class="carousel-control right"
+                                        href="#myCarousel" data-slide="next">›</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="slider-thumbs">
+                            <!-- thumb navigation carousel items -->
+                            <ul class="list-inline">
+                                @for (int i = 0; i < Model.MVProduct.LImageSlider.Count; i++)
+                                {
+                                    var item = Model.MVProduct.LImageSlider[i];
+                                    <li class="col-xs-3"><a id="@("carousel-selector-" + i.ToString())" class="@(i==0?"selected":"")">
+                                        <img src="@item.ImagePath">
+                                    </a></li>
+								
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!--col end-->
+                <div class="col-xs-12 col-sm-6 col-md-8">
+                    <div class="p-name">@Model.MVProduct.Product_Title</div>
+                    <div class="p-info">
+                        @Html.Raw(Licunzhang.Common.StringPlus.FormatTextArea(Model.MVProduct.Description))
+                    </div>
+                    <div class="p-top-contact">
+                        <ul>
+                            <li><i>400热线：</i>&nbsp;400-9264-999</li>
+                            <li><i>固定电话：</i>&nbsp;@Model.MWebConfig.Web_Tel</li>
+                            <li><i>客服QQ：</i>&nbsp;@Model.MWebConfig.Web_QQ</li>
+                            <li><a class="btn" target="_blank" href="http://wpa.qq.com/msgrd?v=3&amp;uin=@ServiceQQ&amp;site=qq&amp;menu=yes">
+                                在线洽谈</a> <a href="#book" class="btn golink">留言咨询</a> </li>
+                        </ul>
+                    </div>
+                </div>
+                <!--col end-->
+                <div class="col-xs-12">
+                    <div class="p-cate">
+                        <ul>
+                            <li class="col-xs-4"><a href="#des" class="golink">产品描述</a> </li>
+                            <li class="col-xs-4"><a href="#rel" class="golink">推荐产品</a> </li>
+                            <li class="col-xs-4"><a href="#book" class="golink">在线留言</a> </li>
+                        </ul>
+                    </div>
+                    <!--p-cate end-->
+                    <a name="des"></a>
+                    <div class="p-about">
+                        <div class="p-title">
+                            产品描述</div>
+                        @Html.Raw(Model.MVProduct.First_Content)
+                    </div>
+                    <a name="rel"></a>
+                    <div class="p-rel">
+                        <div class="p-title">
+                            推荐产品</div>
+                        <div class="row">
+                            <ul>
+                                @foreach (var item in LRecommandProduct)
+                                {
+                                    <li class="col-xs-12"><a href="@item.Product_Url" title="@item.Product_Title">
+                                        <img src="@item.FirstBigImage" alt="@item.Product_Title"></a><span><a href="@item.Product_Url" title="@item.Product_Title">@item.Product_Title</a></span></li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                    <!--p-rel end-->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="bg-black-bg">
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-6 col-md-3">
+                <div class="b-logo">
+                    <img src="/content/assets/b-logo.png"></div>
+                <ul class="b-link row">
+                    @foreach (var item in LProductSonBlock)
+                    {
+                        <li class="col-xs-6 col-sm-12"><a href="@item.Block_Url" title="@item.Block_Name">-
+                            @item.Block_Name</a></li>
+                    }
+                </ul>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                @Html.Partial("/Views/Home/PartialContact.cshtml", Model)
+                <div class="b-code">
+                    <ul class="row">
+                        @foreach (var item in LRecommendEWM)
+                        {
+                            <li class="col-xs-6">
+                                <img src="@item.FirstBigImage" alt="@item.Infor_Title">
+                                <span>
+                                    @item.Infor_STitle
+                                </span></li>
+                        }
+                    </ul>
+                </div>
+                <!--code end-->
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-5">
+                <a name="book"></a>
+                <div class="b-message">
+                    @Html.Partial("/Views/Home/PartialMessage.cshtml", Model)
+                </div>
+                <!--message end-->
+            </div>
+            <!--col-end-->
+        </div>
+        <!--row end-->
+    </div>
+    <!--cont end-->
+</div>
+@*头部样式*@
+@section HeadStyles{
+    <link rel="stylesheet" href="/content/assets/owl.carousel.css">
+    <link rel="stylesheet" href="/content/assets/owl.theme.css">
+}
+@*底部引用js文件*@
+@section BottomScripts{
+    <script type="text/javascript" src="/content/js/owl.carousel.min.js"></script>
+    <script type="text/javascript" src="/content/js/main.js" ></script>
+}
+@*底部自定义js脚本*@
+@section PageScript{
+    <script type="text/javascript">
+        $(function () {
+            $('.p-rel ul').owlCarousel({ items: @LRecommandProduct.Count, navigation: true,
+                navigationText: ["", ""], autoPlay: true, lazyLoad: true,
+                scrollPerPage: false
+            });
+        });
+    </script>
+}
